@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#8a005a"/>
+      <stop offset="100%" stop-color="#3b0030"/>
+    </radialGradient>
+
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffd1f0"/>
+      <stop offset="100%" stop-color="#ff1493"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Outer Circle -->
+  <circle cx="256" cy="256" r="250" fill="#2f355a"/>
+  
+  <!-- Inner Circle -->
+  <circle cx="256" cy="256" r="220" fill="url(#bgGrad)"/>
+
+  <!-- Heart Shape -->
+  <path 
+    d="M256 370 
+       C200 320, 120 260, 120 190
+       C120 140, 160 110, 200 110
+       C230 110, 250 130, 256 150
+       C262 130, 282 110, 312 110
+       C352 110, 392 140, 392 190
+       C392 260, 312 320, 256 370 Z"
+    fill="url(#heartGrad)"
+  />
+
+  <!-- Left Face -->
+  <path 
+    d="M210 260 
+       C190 250, 180 230, 190 210
+       C200 190, 230 190, 240 210
+       C250 230, 240 250, 220 260 Z"
+    fill="#d98ab5"
+  />
+
+  <!-- Right Face -->
+  <path 
+    d="M300 260 
+       C320 250, 330 230, 320 210
+       C310 190, 280 190, 270 210
+       C260 230, 270 250, 290 260 Z"
+    fill="#ff69b4"
+  />
+
+  <!-- Trademark -->
+  <text x="330" y="120" font-size="20" fill="#ffffff">™</text>
+</svg>

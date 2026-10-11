@@ -1,0 +1,374 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/png" href="/user-logo.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, user-scalable=no"
+    />
+    <title>BBSNC – Biswa Bangla Social Networking Club</title>
+
+    <!-- Block display-capture at browser policy level -->
+    <meta http-equiv="Permissions-Policy" content="display-capture=()" />
+    <meta name="referrer" content="no-referrer" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <style>
+      /* Prevent ALL selection site-wide */
+      *,
+      *::before,
+      *::after {
+        -webkit-user-select: none !important;
+        -moz-user-select: none !important;
+        -ms-user-select: none !important;
+        user-select: none !important;
+        -webkit-touch-callout: none !important;
+      }
+      /* Re-allow typing in inputs */
+      input,
+      textarea {
+        -webkit-user-select: text !important;
+        -moz-user-select: text !important;
+        user-select: text !important;
+        -webkit-touch-callout: default !important;
+      }
+      /* Force GPU layer on video/img — black in many iOS/Android screen recorders */
+      video,
+      img,
+      canvas {
+        -webkit-user-drag: none !important;
+        pointer-events: none !important;
+        -webkit-transform: translateZ(0) !important;
+        transform: translateZ(0) !important;
+        will-change: transform;
+        -webkit-touch-callout: none !important;
+      }
+      /* Re-enable pointer events for interactive elements */
+      input,
+      textarea,
+      button,
+      a,
+      label,
+      select,
+      [role="button"],
+      [tabindex] {
+        pointer-events: auto !important;
+      }
+      /* Block print / Save as PDF */
+      @media print {
+        html,
+        body {
+          display: none !important;
+          visibility: hidden !important;
+        }
+      }
+      /* Protection overlay */
+      #rc-protect-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        background: #0d0d0d;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 16px;
+        font-family: "Nunito", sans-serif;
+      }
+      #rc-protect-overlay.active {
+        display: flex;
+      }
+      #rc-protect-overlay .rc-icon {
+        font-size: 56px;
+      }
+      #rc-protect-overlay p {
+        color: #f47eb0;
+        font-size: 18px;
+        font-weight: 800;
+        text-align: center;
+        padding: 0 40px;
+        line-height: 1.6;
+      }
+      /* Blur root when focus/visibility lost */
+      #root.rc-blurred {
+        filter: blur(20px) brightness(0.3) !important;
+        transition: filter 0.2s;
+        pointer-events: none;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Anti-capture overlay -->
+    <div id="rc-protect-overlay">
+      <div class="rc-icon">🚫</div>
+      <p>
+        Screenshots &amp; Screen Recording<br />are not allowed on Red Cherry
+      </p>
+    </div>
+
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+
+    <script>
+      (function () {
+        "use strict";
+
+        var overlay = document.getElementById("rc-protect-overlay");
+        var root = document.getElementById("root");
+        var hideTimer = null;
+
+        /* ── Helpers ─────────────────────────────────────────────── */
+        function blurRoot(on) {
+          if (!root) return;
+          if (on) root.classList.add("rc-blurred");
+          else root.classList.remove("rc-blurred");
+        }
+
+        function showOverlay(ms) {
+          if (!overlay) return;
+          overlay.classList.add("active");
+          blurRoot(true);
+          clearTimeout(hideTimer);
+          hideTimer = setTimeout(function () {
+            overlay.classList.remove("active");
+            blurRoot(false);
+          }, ms || 2500);
+          // Wipe clipboard so screenshot paste is empty
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText("").catch(function () {});
+            }
+          } catch (e) {}
+        }
+
+
+        /* ── 2. Keyboard shortcuts (desktop) ─────────────────────── */
+        document.addEventListener(
+          "keydown",
+          function (e) {
+            if (e.key === "PrintScreen" || e.code === "PrintScreen") {
+              e.preventDefault();
+              showOverlay(2500);
+              return;
+            }
+            if (
+              e.shiftKey &&
+              (e.key === "s" || e.key === "S") &&
+              (e.metaKey || e.getModifierState("OS"))
+            ) {
+              e.preventDefault();
+              showOverlay(2500);
+              return;
+            }
+            if (e.ctrlKey && e.shiftKey && (e.key === "s" || e.key === "S")) {
+              e.preventDefault();
+              showOverlay(2500);
+              return;
+            }
+            if (e.ctrlKey && !e.shiftKey && (e.key === "p" || e.key === "P")) {
+              e.preventDefault();
+              return;
+            }
+            if (e.key === "F12") {
+              e.preventDefault();
+              return;
+            }
+            if (
+              e.ctrlKey &&
+              e.shiftKey &&
+              (e.key === "I" || e.key === "i" || e.key === "J" || e.key === "j")
+            ) {
+              e.preventDefault();
+              return;
+            }
+            if (e.ctrlKey && !e.shiftKey && (e.key === "u" || e.key === "U")) {
+              e.preventDefault();
+              return;
+            }
+            if (e.ctrlKey && !e.shiftKey && (e.key === "s" || e.key === "S")) {
+              e.preventDefault();
+              return;
+            }
+          },
+          true,
+        );
+
+        /* ── 3. Visibility / focus (desktop + mobile app switch) ─── */
+        document.addEventListener("visibilitychange", function () {
+          blurRoot(document.hidden);
+          if (document.hidden) {
+            setTimeout(function () {
+              blurRoot(false);
+            }, 1200);
+          }
+        });
+        window.addEventListener("blur", function () {
+          blurRoot(true);
+        });
+        window.addEventListener("focus", function () {
+          blurRoot(false);
+        });
+        window.addEventListener("pagehide", function () {
+          blurRoot(true);
+        });
+        window.addEventListener("pageshow", function () {
+          blurRoot(false);
+        });
+
+        /* ── 4. Drag-and-drop block ───────────────────────────────── */
+        document.addEventListener(
+          "dragstart",
+          function (e) {
+            e.preventDefault();
+          },
+          true,
+        );
+        document.addEventListener(
+          "drop",
+          function (e) {
+            e.preventDefault();
+          },
+          true,
+        );
+
+        /* ── 5. Touch: block long-press on media (mobile save) ───── */
+        document.addEventListener(
+          "touchstart",
+          function (e) {
+            var tag =
+              e.target && e.target.tagName
+                ? e.target.tagName.toUpperCase()
+                : "";
+            if (tag === "VIDEO" || tag === "IMG" || tag === "CANVAS") {
+              e.preventDefault();
+            }
+          },
+          { passive: false, capture: true },
+        );
+
+        document.addEventListener(
+          "touchend",
+          function (e) {
+            var tag =
+              e.target && e.target.tagName
+                ? e.target.tagName.toUpperCase()
+                : "";
+            if (tag === "VIDEO" || tag === "IMG" || tag === "CANVAS") {
+              e.preventDefault();
+            }
+          },
+          { passive: false, capture: true },
+        );
+
+        /* ── 6. Block getDisplayMedia ─────────────────────────────── */
+        try {
+          if (navigator.mediaDevices) {
+            Object.defineProperty(navigator.mediaDevices, "getDisplayMedia", {
+              value: function () {
+                showOverlay(3000);
+                return Promise.reject(
+                  new DOMException(
+                    "Screen capture is not permitted on this site.",
+                    "NotAllowedError",
+                  ),
+                );
+              },
+              writable: false,
+              configurable: false,
+            });
+          }
+        } catch (e) {}
+
+        /* ── 7. Block document Picture-in-Picture ────────────────── */
+        try {
+          if (window.documentPictureInPicture) {
+            Object.defineProperty(
+              window.documentPictureInPicture,
+              "requestWindow",
+              {
+                value: function () {
+                  return Promise.reject(
+                    new DOMException("Not allowed.", "NotAllowedError"),
+                  );
+                },
+                writable: false,
+              },
+            );
+          }
+        } catch (e) {}
+
+        /* ── 8. Block HTMLVideoElement.requestPictureInPicture ───── */
+        try {
+          if (
+            HTMLVideoElement &&
+            HTMLVideoElement.prototype.requestPictureInPicture
+          ) {
+            HTMLVideoElement.prototype.requestPictureInPicture = function () {
+              return Promise.reject(
+                new DOMException("Not allowed.", "NotAllowedError"),
+              );
+            };
+          }
+        } catch (e) {}
+
+        /* ── 9. CSS print block ───────────────────────────────────── */
+        var noprint = document.createElement("style");
+        noprint.textContent =
+          "@media print { html,body { display:none !important; } }";
+        document.head.appendChild(noprint);
+
+        /* ── 10. DevTools detection via window size diff ─────────── */
+        var devOpen = false;
+        setInterval(function () {
+          var w = window.outerWidth - window.innerWidth > 160;
+          var h = window.outerHeight - window.innerHeight > 160;
+          if ((w || h) && !devOpen) {
+            devOpen = true;
+            blurRoot(true);
+          }
+          if (!w && !h && devOpen) {
+            devOpen = false;
+            blurRoot(false);
+          }
+        }, 800);
+
+        /* ── 11. MutationObserver: strip controls from all videos ─── */
+        var mo = new MutationObserver(function (mutations) {
+          mutations.forEach(function (m) {
+            if (m.type === "attributes" && m.target.tagName === "VIDEO") {
+              m.target.removeAttribute("controls");
+            }
+            if (m.type === "childList") {
+              m.addedNodes.forEach(function (node) {
+                if (node.querySelectorAll) {
+                  node.querySelectorAll("video").forEach(function (v) {
+                    v.removeAttribute("controls");
+                    v.setAttribute(
+                      "controlslist",
+                      "nodownload nofullscreen noremoteplayback",
+                    );
+                    v.setAttribute("disablePictureInPicture", "true");
+                    v.setAttribute("playsinline", "true");
+                  });
+                }
+              });
+            }
+          });
+        });
+        mo.observe(document.body, {
+          childList: true,
+          subtree: true,
+          attributes: true,
+          attributeFilter: ["controls", "controlslist"],
+        });
+      })();
+    </script>
+  </body>
+</html>

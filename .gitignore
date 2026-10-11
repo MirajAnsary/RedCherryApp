@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# Secrets — never commit real keys (see each folder's .env.example)
+.env
+.env.*
+!.env.example
+
+# Build output
+dist/
+
+# User-uploaded files (profile photos, KYC documents, videos)
+uploads/
+
+# Logs & OS / editor files
+*.log
+npm-debug.log*
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
